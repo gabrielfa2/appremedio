@@ -56,9 +56,9 @@ export default function HomeScreen() {
   const medicacaoesTomadas = medicacoes.filter(med => med.tomado);
 
   const marcarComoTomado = (medicacaoId: string) => {
-    setMedicacoes(prev => 
-      prev.map(med => 
-        med.id === medicacaoId 
+    setMedicacoes(prev =>
+      prev.map(med =>
+        med.id === medicacaoId
           ? { ...med, tomado: true }
           : med
       )
@@ -82,6 +82,7 @@ export default function HomeScreen() {
   };
 
   const renderMedicacaoCard = (medicacao: Medicacao, isPendente: boolean = true) => (
+    <TouchableOpacity
       style={styles.medicacaoCard}
       onPress={() => isPendente ? marcarComoTomado(medicacao.id) : null}
       disabled={!isPendente}>
@@ -104,7 +105,7 @@ export default function HomeScreen() {
             {medicacao.tomado ? (
               <CheckCircle size={24} color="rgba(255,255,255,0.9)" />
             ) : (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.pendingButton}
                 onPress={() => marcarComoTomado(medicacao.id)}>
                 <View style={styles.pendingIndicator} />
@@ -160,7 +161,7 @@ export default function HomeScreen() {
             <Text style={styles.sectionTitle}>Próximas Medicações</Text>
             <Text style={styles.sectionSubtitle}>Hoje</Text>
           </View>
-          
+
           {proximasMedicacoes.map(medicacao => renderMedicacaoCard(medicacao, true))}
         </View>
 
@@ -170,7 +171,7 @@ export default function HomeScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Concluídas Hoje</Text>
             </View>
-            
+
             {medicacaoesTomadas.map(medicacao => renderMedicacaoCard(medicacao, false))}
           </View>
         )}
@@ -179,7 +180,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ações Rápidas</Text>
           <View style={styles.quickActionsGrid}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.quickActionCard}
               onPress={adicionarNovoMedicamento}>
               <LinearGradient
@@ -189,7 +190,7 @@ export default function HomeScreen() {
                 <Text style={styles.quickActionText}>Novo Medicamento</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.quickActionCard}
               onPress={agendarConsulta}>
               <LinearGradient
@@ -202,9 +203,9 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-      
+
       {/* Botão Flutuante */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.floatingButton}
         onPress={adicionarNovoMedicamento}>
         <LinearGradient
