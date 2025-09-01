@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     resizeMode: 'cover',
-    opacity: 0.5, // Opacidade para a imagem não ficar tão forte
+    opacity: 2, // Opacidade para a imagem não ficar tão forte
   },
   gradientOverlay: {
     padding: 20,
