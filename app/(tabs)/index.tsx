@@ -90,7 +90,7 @@ export default function HomeScreen() {
       {/* O ScrollView agora começa depois do seletor para que o seletor não role junto */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Boa tarde!</Text>
+          <Text style={styles.greeting}>Boa tarde, Cuidante!</Text>
           <Text style={styles.subtitle}>Como estão seus assistidos?</Text>
         </View>
       </View>
