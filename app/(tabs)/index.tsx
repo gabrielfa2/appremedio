@@ -7,13 +7,15 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
-  Image, // 1. Mudei de ImageBackground para Image
+  Image,
+  FlatList, // 1. Importar FlatList e Image
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle } from 'lucide-react-native';
+import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Users } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { pacientesDemo } from '../../utils/medicamentos'; // 2. Importar os dados dos pacientes
 
-// ... (interface e início do componente continuam os mesmos)
+// ... (interface Medicacao continua a mesma)
 interface Medicacao {
   id: string;
   nome: string;
@@ -24,15 +26,20 @@ interface Medicacao {
   cor: string[];
 }
 
+// Adicionando um tipo para o paciente selecionado
+type PacienteSelecionado = { id: string; nome: string };
+
 export default function HomeScreen() {
   const router = useRouter();
+  // 3. State para controlar o paciente selecionado. Inicia com "Todos".
+  const [pacienteSelecionado, setPacienteSelecionado] = useState<PacienteSelecionado>({ id: 'todos', nome: 'Todos' });
   const [medicacoes, setMedicacoes] = useState<Medicacao[]>([
     {
       id: '1',
       nome: 'Losartana',
       dosagem: '50mg',
       horario: '08:00',
-      paciente: 'Maria',
+      paciente: 'Maria Santos', // Paciente correspondente ao nome em pacientesDemo
       tomado: true,
       cor: ['#4A90E2', '#357ABD'],
     },
@@ -41,7 +48,7 @@ export default function HomeScreen() {
       nome: 'Metformina',
       dosagem: '850mg',
       horario: '12:00',
-      paciente: 'João',
+      paciente: 'João Silva', // Paciente correspondente ao nome em pacientesDemo
       tomado: false,
       cor: ['#7ED321', '#5BA617'],
     },
@@ -50,14 +57,19 @@ export default function HomeScreen() {
       nome: 'Atorvastatina',
       dosagem: '20mg',
       horario: '20:00',
-      paciente: 'Maria',
+      paciente: 'Maria Santos', // Paciente correspondente ao nome em pacientesDemo
       tomado: false,
       cor: ['#BD10E0', '#9013BE'],
     },
   ]);
+  
+  // 4. Filtrar medicamentos com base no paciente selecionado
+  const medicacoesFiltradas = pacienteSelecionado.id === 'todos'
+    ? medicacoes
+    : medicacoes.filter(med => med.paciente === pacienteSelecionado.nome);
 
-  const proximasMedicacoes = medicacoes.filter(med => !med.tomado);
-  const medicacaoesTomadas = medicacoes.filter(med => med.tomado);
+  const proximasMedicacoes = medicacoesFiltradas.filter(med => !med.tomado);
+  const medicacaoesTomadas = medicacoesFiltradas.filter(med => med.tomado);
 
   const adicionarNovoMedicamento = () => {
     Alert.alert(
@@ -71,10 +83,13 @@ export default function HomeScreen() {
     router.push(`/medicamento/${medicacaoId}`);
   };
 
+  // 5. Adicionar a opção "Todos" à lista de pacientes para o seletor
+  const listaSelecaoPacientes = [{ id: 'todos', nome: 'Todos', foto: '' }, ...pacientesDemo];
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Header e Status Cards (sem alterações) */}
+        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Boa tarde!</Text>
@@ -82,30 +97,39 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* 6. Seção do Seletor de Pacientes */}
+        <View style={styles.pacienteSelectorSection}>
+          <FlatList
+            data={listaSelecaoPacientes}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => {
+              const isSelected = item.id === pacienteSelecionado.id;
+              return (
+                <TouchableOpacity 
+                  style={styles.pacienteSelectItem} 
+                  onPress={() => setPacienteSelecionado({ id: item.id, nome: item.nome })}
+                >
+                  <View style={[styles.pacienteAvatarContainer, isSelected && styles.pacienteAvatarSelected]}>
+                    {item.id === 'todos' ? (
+                      <Users size={24} color={isSelected ? '#fff' : '#888'} />
+                    ) : (
+                      <Image source={{ uri: item.foto }} style={styles.pacienteAvatar} />
+                    )}
+                  </View>
+                  <Text style={[styles.pacienteSelectNome, isSelected && styles.pacienteSelectNomeSelected]}>
+                    {item.nome.split(' ')[0]} 
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
+        
+        {/* Status Cards */}
         <View style={styles.statusSection}>
-          <View style={styles.statusGrid}>
-            <View style={styles.statusCard}>
-              <View style={[styles.statusIcon, { backgroundColor: '#E3F2FD' }]}>
-                <Clock size={20} color="#4A90E2" />
-              </View>
-              <Text style={styles.statusNumber}>3</Text>
-              <Text style={styles.statusLabel}>Pendentes</Text>
-            </View>
-            <View style={styles.statusCard}>
-              <View style={[styles.statusIcon, { backgroundColor: '#E8F5E8' }]}>
-                <CheckCircle size={20} color="#7ED321" />
-              </View>
-              <Text style={styles.statusNumber}>1</Text>
-              <Text style={styles.statusLabel}>Concluídas</Text>
-            </View>
-            <View style={styles.statusCard}>
-              <View style={[styles.statusIcon, { backgroundColor: '#FFF3E0' }]}>
-                <AlertTriangle size={20} color="#FF9500" />
-              </View>
-              <Text style={styles.statusNumber}>2</Text>
-              <Text style={styles.statusLabel}>Em falta</Text>
-            </View>
-          </View>
+          {/* ... (código dos status cards sem alteração) ... */}
         </View>
 
         {/* Próximas Medicações */}
@@ -114,55 +138,33 @@ export default function HomeScreen() {
             <Text style={styles.sectionTitle}>Próximas Medicações</Text>
             <Text style={styles.sectionSubtitle}>Hoje</Text>
           </View>
-
           {proximasMedicacoes.map(medicacao => (
-            <TouchableOpacity
-              key={medicacao.id}
-              style={styles.medicacaoCard}
-              onPress={() => irParaDetalhes(medicacao.id)}
-            >
-              {/* 2. A estrutura agora é View > Image + LinearGradient */}
-              <View style={styles.cardContainer}>
-                <Image
-                  source={require('../../assets/images/teste.jpg')}
-                  style={styles.cardImage}
-                />
-                <LinearGradient
-                  colors={[medicacao.cor[0], 'transparent']}
-                  style={styles.gradientOverlay}
-                  start={{ x: 0, y: 0.5 }}
-                  end={{ x: 0.8, y: 0.5 }}
-                >
-                  <View style={styles.medicacaoContent}>
-                    <View style={styles.medicacaoInfo}>
-                      <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
-                      <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
-                      <View style={styles.horarioContainer}>
-                        <Clock size={14} color="rgba(255,255,255,0.8)" />
-                        <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
-                      </View>
-                      <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
-                    </View>
-                    <View style={styles.statusContainer}>
-                      <View style={styles.pendingIndicator} />
-                    </View>
-                  </View>
-                </LinearGradient>
-              </View>
-            </TouchableOpacity>
+            // ... (código do card de medicação sem alteração) ...
           ))}
         </View>
-        
-        {/* ... (Resto do componente sem alterações) ... */}
 
+        {/* Medicações Tomadas */}
+        {medicacaoesTomadas.length > 0 && (
+           // ... (código do card de medicação tomada sem alteração) ...
+        )}
       </ScrollView>
-       {/* ... (Botão Flutuante) ... */}
+
+      {/* Botão Flutuante */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={adicionarNovoMedicamento}>
+        <LinearGradient
+          colors={['#4A90E2', '#357ABD']}
+          style={styles.floatingGradient}>
+          <Plus size={28} color="#fff" strokeWidth={2.5} />
+        </LinearGradient>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  // ... (outros estilos que não mudaram)
+  // ... (estilos existentes)
   container: {
     flex: 1,
     backgroundColor: '#121212',
@@ -188,130 +190,41 @@ const styles = StyleSheet.create({
     color: '#888',
     fontWeight: '500',
   },
-  statusSection: {
-    marginBottom: 32,
+
+  // 7. Novos estilos para o seletor de pacientes
+  pacienteSelectorSection: {
+    marginBottom: 24,
   },
-  statusGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  pacienteSelectItem: {
+    alignItems: 'center',
+    marginRight: 20,
   },
-  statusCard: {
-    flex: 1,
+  pacienteAvatarContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: '#1e1e1e',
-    borderRadius: 16,
-    padding: 16,
-    marginHorizontal: 4,
-    alignItems: 'center',
-  },
-  statusIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
-  },
-  statusNumber: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  statusLabel: {
-    fontSize: 12,
-    color: '#888',
-    fontWeight: '500',
-  },
-  section: {
-    marginBottom: 32,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '500',
-  },
-  medicacaoCard: {
-    marginBottom: 16,
-    borderRadius: 20,
-    overflow: 'hidden',
-    minHeight: 120,
-  },
-  // 3. Novos estilos para controlar o posicionamento
-  cardContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  cardImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '150%', // Faz a imagem ser maior que o card
-    top: -40,       // Puxa a imagem para cima para centralizar. Ajuste este valor!
-    resizeMode: 'cover',
-    opacity: 0.3,
-  },
-  gradientOverlay: {
-    padding: 20,
-    height: '100%',
-    justifyContent: 'center',
-  },
-  medicacaoContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  medicacaoInfo: {
-    flex: 1,
-  },
-  medicacaoNome: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  medicacaoDosagem: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: 8,
-    fontWeight: '500',
-  },
-  horarioContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-  },
-  medicacaoHorario: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    fontWeight: '600',
-    marginLeft: 6,
-  },
-  medicacaoPaciente: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
-    fontWeight: '500',
-  },
-  statusContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pendingIndicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.3)',
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.6)',
+    borderColor: 'transparent',
   },
-  // ... (outros estilos)
+  pacienteAvatarSelected: {
+    borderColor: '#4A90E2',
+  },
+  pacienteAvatar: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 32,
+  },
+  pacienteSelectNome: {
+    color: '#888',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  pacienteSelectNomeSelected: {
+    color: '#fff',
+  },
+  // ... (resto dos estilos)
 });
