@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     height: '150%',
     top: -40,
     resizeMode: 'cover',
-    opacity: 1,
+    opacity: 0.7,
   },
   gradientOverlay: {
     padding: 20,
