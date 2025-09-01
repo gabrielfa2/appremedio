@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 interface Medicacao {
   id: string;
@@ -22,6 +23,7 @@ interface Medicacao {
 }
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [medicacoes, setMedicacoes] = useState<Medicacao[]>([
     {
       id: '1',
@@ -55,22 +57,16 @@ export default function HomeScreen() {
   const proximasMedicacoes = medicacoes.filter(med => !med.tomado);
   const medicacaoesTomadas = medicacoes.filter(med => med.tomado);
 
-  const marcarComoTomado = (medicacaoId: string) => {
-    setMedicacoes(prev =>
-      prev.map(med =>
-        med.id === medicacaoId
-          ? { ...med, tomado: true }
-          : med
-      )
-    );
-  };
-
   const adicionarNovoMedicamento = () => {
     Alert.alert(
       'Novo Medicamento',
       'Esta funcionalidade será implementada em breve. Você poderá cadastrar novos medicamentos de forma simples e rápida.',
       [{ text: 'OK' }]
     );
+  };
+  
+  const irParaDetalhes = (medicacaoId: string) => {
+    router.push(`/medicamento/${medicacaoId}`);
   };
 
   return (
@@ -120,16 +116,12 @@ export default function HomeScreen() {
 
           {proximasMedicacoes.map(medicacao => (
             <TouchableOpacity
-              key={medicacao.id} // CORREÇÃO: Adicionada a key única
+              key={medicacao.id}
               style={styles.medicacaoCard}
-              onPress={() => marcarComoTomado(medicacao.id)}
-              disabled={false}
+              onPress={() => irParaDetalhes(medicacao.id)}
             >
-              <LinearGradient
-                colors={medicacao.cor}
-                style={styles.medicacaoGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}>
+              {/* ALTERAÇÃO: Troquei o LinearGradient por uma View com cor sólida */}
+              <View style={[styles.medicacaoContainer, { backgroundColor: medicacao.cor[0] }]}>
                 <View style={styles.medicacaoContent}>
                   <View style={styles.medicacaoInfo}>
                     <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
@@ -141,14 +133,10 @@ export default function HomeScreen() {
                     <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
                   </View>
                   <View style={styles.statusContainer}>
-                    <TouchableOpacity
-                      style={styles.pendingButton}
-                      onPress={() => marcarComoTomado(medicacao.id)}>
-                      <View style={styles.pendingIndicator} />
-                    </TouchableOpacity>
+                     <View style={styles.pendingIndicator} />
                   </View>
                 </View>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
@@ -162,15 +150,12 @@ export default function HomeScreen() {
 
             {medicacaoesTomadas.map(medicacao => (
               <TouchableOpacity
-                key={medicacao.id} // CORREÇÃO: Adicionada a key única
+                key={medicacao.id}
                 style={styles.medicacaoCard}
-                disabled={true}
+                onPress={() => irParaDetalhes(medicacao.id)}
               >
-                <LinearGradient
-                  colors={medicacao.cor}
-                  style={styles.medicacaoGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}>
+                {/* ALTERAÇÃO: Troquei o LinearGradient por uma View com cor sólida */}
+                <View style={[styles.medicacaoContainer, { backgroundColor: medicacao.cor[0] }]}>
                   <View style={styles.medicacaoContent}>
                     <View style={styles.medicacaoInfo}>
                       <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
@@ -185,7 +170,7 @@ export default function HomeScreen() {
                       <CheckCircle size={24} color="rgba(255,255,255,0.9)" />
                     </View>
                   </View>
-                </LinearGradient>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -290,7 +275,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
-  medicacaoGradient: {
+  // ALTERAÇÃO: Renomeei medicacaoGradient para medicacaoContainer
+  medicacaoContainer: {
     padding: 20,
     minHeight: 120,
   },
@@ -341,32 +327,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.3)',
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.6)',
-  },
-  pendingButton: {
-    padding: 4,
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  quickActionCard: {
-    flex: 1,
-    marginHorizontal: 8,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  quickActionGradient: {
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 100,
-  },
-  quickActionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-    marginTop: 8,
-    textAlign: 'center',
   },
   floatingButton: {
     position: 'absolute',
