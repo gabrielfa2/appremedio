@@ -8,12 +8,12 @@ import {
   SafeAreaView,
   Alert,
   Image,
-  FlatList, // Importado para a lista de pacientes
+  FlatList,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Users } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { pacientesDemo } from '../../utils/medicamentos'; // Importando os dados dos pacientes
+import { pacientesDemo } from '../../utils/medicamentos';
 
 interface Medicacao {
   id: string;
@@ -25,12 +25,10 @@ interface Medicacao {
   cor: string[];
 }
 
-// Tipo para o estado do paciente selecionado
 type PacienteSelecionado = { id: string; nome: string };
 
 export default function HomeScreen() {
   const router = useRouter();
-  // Estado para controlar o paciente selecionado, começando com "Todos"
   const [pacienteSelecionado, setPacienteSelecionado] = useState<PacienteSelecionado>({ id: 'todos', nome: 'Todos' });
   const [medicacoes, setMedicacoes] = useState<Medicacao[]>([
     {
@@ -62,7 +60,6 @@ export default function HomeScreen() {
     },
   ]);
 
-  // Filtra a lista de medicamentos com base no paciente que foi selecionado
   const medicacoesFiltradas = pacienteSelecionado.id === 'todos'
     ? medicacoes
     : medicacoes.filter(med => med.paciente === pacienteSelecionado.nome);
@@ -82,20 +79,17 @@ export default function HomeScreen() {
     router.push(`/medicamento/${medicacaoId}`);
   };
 
-  // Cria a lista para o seletor, adicionando um item "Todos" no início
   const listaSelecaoPacientes = [{ id: 'todos', nome: 'Todos', foto: '' }, ...pacientesDemo];
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* O ScrollView agora começa depois do seletor para que o seletor não role junto */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Boa tarde, Cuidante!</Text>
-          <Text style={styles.subtitle}>Como estão seus assistidos?</Text>
+          <Text style={styles.greeting}>Boa tarde!</Text>
+          <Text style={styles.subtitle}>Como estão seus familiares?</Text>
         </View>
       </View>
 
-      {/* Seção do Seletor de Pacientes */}
       <View style={styles.pacienteSelectorSection}>
         <FlatList
           data={listaSelecaoPacientes}
@@ -127,7 +121,6 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Status Cards */}
         <View style={styles.statusSection}>
           <View style={styles.statusGrid}>
             <View style={styles.statusCard}>
@@ -205,27 +198,40 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>Concluídas Hoje</Text>
             </View>
 
+            {/* APLICAÇÃO DA ALTERAÇÃO AQUI */}
             {medicacaoesTomadas.map(medicacao => (
               <TouchableOpacity
                 key={medicacao.id}
                 style={styles.medicacaoCard}
                 onPress={() => irParaDetalhes(medicacao.id)}
               >
-                <View style={[styles.medicacaoContainer, { backgroundColor: medicacao.cor[0] }]}>
-                  <View style={styles.medicacaoContent}>
-                    <View style={styles.medicacaoInfo}>
-                      <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
-                      <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
-                      <View style={styles.horarioContainer}>
-                        <Clock size={14} color="rgba(255,255,255,0.8)" />
-                        <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
+                <View style={styles.cardContainer}>
+                  <Image
+                    source={require('../../assets/images/teste.jpg')}
+                    style={styles.cardImage}
+                  />
+                  <LinearGradient
+                    // O gradiente vai da cor do card para transparente
+                    colors={[medicacao.cor[0], 'transparent']}
+                    style={styles.gradientOverlay}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 0.8, y: 0.5 }}
+                  >
+                    <View style={styles.medicacaoContent}>
+                      <View style={styles.medicacaoInfo}>
+                        <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
+                        <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
+                        <View style={styles.horarioContainer}>
+                          <Clock size={14} color="rgba(255,255,255,0.8)" />
+                          <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
+                        </View>
+                        <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
                       </View>
-                      <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
+                      <View style={styles.statusContainer}>
+                        <CheckCircle size={24} color="rgba(255,255,255,0.9)" />
+                      </View>
                     </View>
-                    <View style={styles.statusContainer}>
-                      <CheckCircle size={24} color="rgba(255,255,255,0.9)" />
-                    </View>
-                  </View>
+                  </LinearGradient>
                 </View>
               </TouchableOpacity>
             ))}
@@ -233,7 +239,6 @@ export default function HomeScreen() {
         )}
       </ScrollView>
 
-      {/* Botão Flutuante */}
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={adicionarNovoMedicamento}>
@@ -310,7 +315,6 @@ const styles = StyleSheet.create({
   },
   statusSection: {
     marginBottom: 32,
-    paddingHorizontal: 20,
   },
   statusGrid: {
     flexDirection: 'row',
@@ -378,16 +382,11 @@ const styles = StyleSheet.create({
     height: '150%',
     top: -40,
     resizeMode: 'cover',
-    opacity: 0.7,
+    opacity: 0.3,
   },
   gradientOverlay: {
     padding: 20,
     height: '100%',
-    justifyContent: 'center',
-  },
-  medicacaoContainer: {
-    padding: 20,
-    minHeight: 120,
     justifyContent: 'center',
   },
   medicacaoContent: {
