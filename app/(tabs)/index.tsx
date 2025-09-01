@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Calendar } from 'lucide-react-native';
+import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 
 interface Medicacao {
   id: string;
@@ -73,42 +73,6 @@ export default function HomeScreen() {
     );
   };
 
-  const renderMedicacaoCard = (medicacao: Medicacao, isPendente: boolean = true) => (
-    <TouchableOpacity
-      style={styles.medicacaoCard}
-      onPress={() => isPendente ? marcarComoTomado(medicacao.id) : null}
-      disabled={!isPendente}>
-      <LinearGradient
-        colors={medicacao.cor}
-        style={styles.medicacaoGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}>
-        <View style={styles.medicacaoContent}>
-          <View style={styles.medicacaoInfo}>
-            <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
-            <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
-            <View style={styles.horarioContainer}>
-              <Clock size={14} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
-            </View>
-            <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
-          </View>
-          <View style={styles.statusContainer}>
-            {medicacao.tomado ? (
-              <CheckCircle size={24} color="rgba(255,255,255,0.9)" />
-            ) : (
-              <TouchableOpacity
-                style={styles.pendingButton}
-                onPress={() => marcarComoTomado(medicacao.id)}>
-                <View style={styles.pendingIndicator} />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </LinearGradient>
-    </TouchableOpacity>
-  );
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -154,7 +118,39 @@ export default function HomeScreen() {
             <Text style={styles.sectionSubtitle}>Hoje</Text>
           </View>
 
-          {proximasMedicacoes.map(medicacao => renderMedicacaoCard(medicacao, true))}
+          {proximasMedicacoes.map(medicacao => (
+            <TouchableOpacity
+              key={medicacao.id} // CORREÇÃO: Adicionada a key única
+              style={styles.medicacaoCard}
+              onPress={() => marcarComoTomado(medicacao.id)}
+              disabled={false}
+            >
+              <LinearGradient
+                colors={medicacao.cor}
+                style={styles.medicacaoGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}>
+                <View style={styles.medicacaoContent}>
+                  <View style={styles.medicacaoInfo}>
+                    <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
+                    <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
+                    <View style={styles.horarioContainer}>
+                      <Clock size={14} color="rgba(255,255,255,0.8)" />
+                      <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
+                    </View>
+                    <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
+                  </View>
+                  <View style={styles.statusContainer}>
+                    <TouchableOpacity
+                      style={styles.pendingButton}
+                      onPress={() => marcarComoTomado(medicacao.id)}>
+                      <View style={styles.pendingIndicator} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Medicações Tomadas */}
@@ -164,7 +160,34 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>Concluídas Hoje</Text>
             </View>
 
-            {medicacaoesTomadas.map(medicacao => renderMedicacaoCard(medicacao, false))}
+            {medicacaoesTomadas.map(medicacao => (
+              <TouchableOpacity
+                key={medicacao.id} // CORREÇÃO: Adicionada a key única
+                style={styles.medicacaoCard}
+                disabled={true}
+              >
+                <LinearGradient
+                  colors={medicacao.cor}
+                  style={styles.medicacaoGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}>
+                  <View style={styles.medicacaoContent}>
+                    <View style={styles.medicacaoInfo}>
+                      <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
+                      <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
+                      <View style={styles.horarioContainer}>
+                        <Clock size={14} color="rgba(255,255,255,0.8)" />
+                        <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
+                      </View>
+                      <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
+                    </View>
+                    <View style={styles.statusContainer}>
+                      <CheckCircle size={24} color="rgba(255,255,255,0.9)" />
+                    </View>
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
       </ScrollView>
