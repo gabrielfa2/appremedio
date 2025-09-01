@@ -91,7 +91,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>Boa tarde!</Text>
-          <Text style={styles.subtitle}>Como estão seus familiares?</Text>
+          <Text style={styles.subtitle}>Como estão seus assistidos?</Text>
         </View>
       </View>
 
