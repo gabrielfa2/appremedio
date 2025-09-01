@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 20,
     overflow: 'hidden', // Importante para que a imagem não vaze para fora das bordas
-    minHeight: 120, // Altura mínima para o card
+    minHeight: 500, // Altura mínima para o card
   },
   medicacaoContainer: {
     padding: 20,
