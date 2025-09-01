@@ -7,11 +7,13 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  ImageBackground, // 1. Importar o ImageBackground
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
+// ... (interface e início do componente continuam os mesmos)
 interface Medicacao {
   id: string;
   nome: string;
@@ -120,23 +122,35 @@ export default function HomeScreen() {
               style={styles.medicacaoCard}
               onPress={() => irParaDetalhes(medicacao.id)}
             >
-              {/* ALTERAÇÃO: Troquei o LinearGradient por uma View com cor sólida */}
-              <View style={[styles.medicacaoContainer, { backgroundColor: medicacao.cor[0] }]}>
-                <View style={styles.medicacaoContent}>
-                  <View style={styles.medicacaoInfo}>
-                    <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
-                    <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
-                    <View style={styles.horarioContainer}>
-                      <Clock size={14} color="rgba(255,255,255,0.8)" />
-                      <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
+              {/* 2. Usar ImageBackground e colocar o LinearGradient dentro */}
+              <ImageBackground
+                source={require('../../assets/images/teste.jpg')}
+                style={styles.cardBackground}
+                imageStyle={styles.cardImage}
+              >
+                <LinearGradient
+                  // 3. O gradiente vai da cor do card para transparente
+                  colors={[medicacao.cor[0], 'transparent']}
+                  style={styles.gradientOverlay}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 0.8, y: 0.5 }} // O gradiente termina antes do fim do card
+                >
+                  <View style={styles.medicacaoContent}>
+                    <View style={styles.medicacaoInfo}>
+                      <Text style={styles.medicacaoNome}>{medicacao.nome}</Text>
+                      <Text style={styles.medicacaoDosagem}>{medicacao.dosagem}</Text>
+                      <View style={styles.horarioContainer}>
+                        <Clock size={14} color="rgba(255,255,255,0.8)" />
+                        <Text style={styles.medicacaoHorario}>{medicacao.horario}</Text>
+                      </View>
+                      <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
                     </View>
-                    <Text style={styles.medicacaoPaciente}>Para: {medicacao.paciente}</Text>
+                    <View style={styles.statusContainer}>
+                      <View style={styles.pendingIndicator} />
+                    </View>
                   </View>
-                  <View style={styles.statusContainer}>
-                     <View style={styles.pendingIndicator} />
-                  </View>
-                </View>
-              </View>
+                </LinearGradient>
+              </ImageBackground>
             </TouchableOpacity>
           ))}
         </View>
@@ -147,14 +161,13 @@ export default function HomeScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Concluídas Hoje</Text>
             </View>
-
+            {/* O card de concluído continua com fundo sólido para diferenciar */}
             {medicacaoesTomadas.map(medicacao => (
               <TouchableOpacity
                 key={medicacao.id}
                 style={styles.medicacaoCard}
                 onPress={() => irParaDetalhes(medicacao.id)}
               >
-                {/* ALTERAÇÃO: Troquei o LinearGradient por uma View com cor sólida */}
                 <View style={[styles.medicacaoContainer, { backgroundColor: medicacao.cor[0] }]}>
                   <View style={styles.medicacaoContent}>
                     <View style={styles.medicacaoInfo}>
@@ -192,6 +205,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  // ... (outros estilos que não mudaram)
   container: {
     flex: 1,
     backgroundColor: '#121212',
@@ -273,12 +287,27 @@ const styles = StyleSheet.create({
   medicacaoCard: {
     marginBottom: 16,
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: 'hidden', // Importante para que a imagem não vaze para fora das bordas
+    minHeight: 120, // Altura mínima para o card
   },
-  // ALTERAÇÃO: Renomeei medicacaoGradient para medicacaoContainer
   medicacaoContainer: {
     padding: 20,
     minHeight: 120,
+    justifyContent: 'center'
+  },
+  // 4. Novos estilos para o background e o gradiente
+  cardBackground: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  cardImage: {
+    resizeMode: 'cover',
+    opacity: 0.3, // Opacidade para a imagem não ficar tão forte
+  },
+  gradientOverlay: {
+    padding: 20,
+    height: '100%',
+    justifyContent: 'center',
   },
   medicacaoContent: {
     flexDirection: 'row',
