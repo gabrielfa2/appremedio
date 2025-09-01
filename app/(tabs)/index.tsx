@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Calendar } from 'lucide-react-native';
@@ -21,7 +22,7 @@ interface Medicacao {
 }
 
 export default function HomeScreen() {
-  const [medicacoes] = useState<Medicacao[]>([
+  const [medicacoes, setMedicacoes] = useState<Medicacao[]>([
     {
       id: '1',
       nome: 'Losartana',
@@ -54,8 +55,36 @@ export default function HomeScreen() {
   const proximasMedicacoes = medicacoes.filter(med => !med.tomado);
   const medicacaoesTomadas = medicacoes.filter(med => med.tomado);
 
+  const marcarComoTomado = (medicacaoId: string) => {
+    setMedicacoes(prev => 
+      prev.map(med => 
+        med.id === medicacaoId 
+          ? { ...med, tomado: true }
+          : med
+      )
+    );
+  };
+
+  const adicionarNovoMedicamento = () => {
+    Alert.alert(
+      'Novo Medicamento',
+      'Esta funcionalidade será implementada em breve. Você poderá cadastrar novos medicamentos de forma simples e rápida.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const agendarConsulta = () => {
+    Alert.alert(
+      'Agendar Consulta',
+      'Esta funcionalidade permitirá agendar e gerenciar consultas médicas dos seus familiares.',
+      [{ text: 'OK' }]
+    );
+  };
+
   const renderMedicacaoCard = (medicacao: Medicacao, isPendente: boolean = true) => (
-    <TouchableOpacity key={medicacao.id} style={styles.medicacaoCard}>
+      style={styles.medicacaoCard}
+      onPress={() => isPendente ? marcarComoTomado(medicacao.id) : null}
+      disabled={!isPendente}>
       <LinearGradient
         colors={medicacao.cor}
         style={styles.medicacaoGradient}
@@ -75,7 +104,11 @@ export default function HomeScreen() {
             {medicacao.tomado ? (
               <CheckCircle size={24} color="rgba(255,255,255,0.9)" />
             ) : (
-              <View style={styles.pendingIndicator} />
+              <TouchableOpacity 
+                style={styles.pendingButton}
+                onPress={() => marcarComoTomado(medicacao.id)}>
+                <View style={styles.pendingIndicator} />
+              </TouchableOpacity>
             )}
           </View>
         </View>
@@ -92,9 +125,6 @@ export default function HomeScreen() {
             <Text style={styles.greeting}>Boa tarde!</Text>
             <Text style={styles.subtitle}>Como estão seus familiares?</Text>
           </View>
-          <TouchableOpacity style={styles.addButton}>
-            <Plus size={24} color="#4A90E2" strokeWidth={2} />
-          </TouchableOpacity>
         </View>
 
         {/* Status Cards */}
@@ -149,7 +179,9 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ações Rápidas</Text>
           <View style={styles.quickActionsGrid}>
-            <TouchableOpacity style={styles.quickActionCard}>
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={adicionarNovoMedicamento}>
               <LinearGradient
                 colors={['#4A90E2', '#357ABD']}
                 style={styles.quickActionGradient}>
@@ -157,7 +189,9 @@ export default function HomeScreen() {
                 <Text style={styles.quickActionText}>Novo Medicamento</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quickActionCard}>
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={agendarConsulta}>
               <LinearGradient
                 colors={['#7ED321', '#5BA617']}
                 style={styles.quickActionGradient}>
@@ -168,6 +202,17 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
+      
+      {/* Botão Flutuante */}
+      <TouchableOpacity 
+        style={styles.floatingButton}
+        onPress={adicionarNovoMedicamento}>
+        <LinearGradient
+          colors={['#4A90E2', '#357ABD']}
+          style={styles.floatingGradient}>
+          <Plus size={28} color="#fff" strokeWidth={2.5} />
+        </LinearGradient>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -197,16 +242,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#888',
     fontWeight: '500',
-  },
-  addButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#1e1e1e',
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#333',
   },
   statusSection: {
     marginBottom: 32,
@@ -318,6 +353,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.6)',
   },
+  pendingButton: {
+    padding: 4,
+  },
   quickActionsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -340,5 +378,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginTop: 8,
     textAlign: 'center',
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    elevation: 8,
+    shadowColor: '#4A90E2',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  floatingGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
