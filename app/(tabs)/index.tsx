@@ -73,14 +73,6 @@ export default function HomeScreen() {
     );
   };
 
-  const agendarConsulta = () => {
-    Alert.alert(
-      'Agendar Consulta',
-      'Esta funcionalidade permitirá agendar e gerenciar consultas médicas dos seus familiares.',
-      [{ text: 'OK' }]
-    );
-  };
-
   const renderMedicacaoCard = (medicacao: Medicacao, isPendente: boolean = true) => (
     <TouchableOpacity
       style={styles.medicacaoCard}
@@ -175,33 +167,6 @@ export default function HomeScreen() {
             {medicacaoesTomadas.map(medicacao => renderMedicacaoCard(medicacao, false))}
           </View>
         )}
-
-        {/* Ações Rápidas */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ações Rápidas</Text>
-          <View style={styles.quickActionsGrid}>
-            <TouchableOpacity
-              style={styles.quickActionCard}
-              onPress={adicionarNovoMedicamento}>
-              <LinearGradient
-                colors={['#4A90E2', '#357ABD']}
-                style={styles.quickActionGradient}>
-                <Plus size={24} color="white" />
-                <Text style={styles.quickActionText}>Novo Medicamento</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.quickActionCard}
-              onPress={agendarConsulta}>
-              <LinearGradient
-                colors={['#7ED321', '#5BA617']}
-                style={styles.quickActionGradient}>
-                <Calendar size={24} color="white" />
-                <Text style={styles.quickActionText}>Consulta Médica</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View>
       </ScrollView>
 
       {/* Botão Flutuante */}
@@ -404,4 +369,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
