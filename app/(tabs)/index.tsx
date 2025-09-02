@@ -68,11 +68,7 @@ export default function HomeScreen() {
   const medicacaoesTomadas = medicacoesFiltradas.filter(med => med.tomado);
 
   const adicionarNovoMedicamento = () => {
-    Alert.alert(
-      'Novo Medicamento',
-      'Esta funcionalidade será implementada em breve. Você poderá cadastrar novos medicamentos de forma simples e rápida.',
-      [{ text: 'OK' }]
-    );
+    router.push('/adicionar-medicamento');
   };
 
   const irParaDetalhes = (medicacaoId: string) => {
